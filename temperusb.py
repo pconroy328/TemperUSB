@@ -293,18 +293,19 @@ if __name__ == '__main__':
         print( 'No location passed in on command line. Will be UNKNOWN' )
         location = 'UNKNOWN'
 
-    #
-    host = discover_mqtt_host()
-    if (host is not None):
-        mqtt_broker_address = host[0]
-        logging.info( 'Found MQTT Broker using mDNS on {}.{}'.format(host[0], host[1]))
-    else:
-        logging.warning('Unable to locate MQTT Broker using DNS')
-        try:
-            mqtt_broker_address = sys.argv[1]
-        except:
-            logging.critical('mDNS failed and no MQTT Broker address passed in via command line. Exiting')
-            sys.exit(1)
+    if (mqtt_broker_address is None):
+        #
+        host = discover_mqtt_host()
+        if (host is not None):
+            mqtt_broker_address = host[0]
+            logging.info( 'Found MQTT Broker using mDNS on {}.{}'.format(host[0], host[1]))
+        else:
+            logging.warning('Unable to locate MQTT Broker using DNS')
+            try:
+                mqtt_broker_address = sys.argv[1]
+            except:
+                logging.critical('mDNS failed and no MQTT Broker address passed in via command line. Exiting')
+                sys.exit(1)
 
     logging.debug('Connecting to {}'.format(mqtt_broker_address))
     m = MessageHandler(broker_address=mqtt_broker_address)
