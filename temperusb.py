@@ -6,8 +6,10 @@ Bill Mania <bill@manialabs.us>
 Source: http://www.manialabs.us/downloads/Temper.py
 
 
-pip3 install pyusb
+sudo pip3 install pyusb
 still connecting to wrong MQTT broker
+
+run sudo until I get the permissions figured out
 """
 
 import usb.core
