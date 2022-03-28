@@ -296,7 +296,7 @@ if __name__ == '__main__':
         location = 'UNKNOWN'
 
     try:
-        tempOffset = int( sys.argv[4] )
+        tempOffset = float( sys.argv[4] )
     except:
         logging.warning( 'No temperature correction passed in on command line. Will be 0.0' )
         tempOffset = 0.0
