@@ -326,9 +326,11 @@ if __name__ == '__main__':
         for device in temper.devices:
             tempc = temper.getTemperature(device)
             tempf = (tempc * 9/5) + 32
+            tempf += tempOffset;
+            
             #devicebus = device.bus
             #deviceaddress = device.address
 
-            print(temper.asJSON(deviceNum, location, tempf))
+            #print(temper.asJSON(deviceNum, location, tempf))
             m.send_info(temper.asJSON(deviceNum, location, tempf))
         time.sleep(60)
