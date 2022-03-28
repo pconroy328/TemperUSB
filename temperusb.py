@@ -4,6 +4,10 @@ Temper - a class for managing a TEMPer USB temperature sensor
 Bill Mania <bill@manialabs.us>
 
 Source: http://www.manialabs.us/downloads/Temper.py
+
+
+pip3 install pyusb
+still connecting to wrong MQTT broker
 """
 
 import usb.core
