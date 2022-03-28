@@ -38,7 +38,7 @@ class Temper():
         self.devices = [device for device in self.device_list]
 
         if self.devices is None:
-            print( 'Unable to find a temperature device' )
+            logging.error( 'Unable to find a temperature device' )
             return
 
         # Try our best to detach the device from any previous state
@@ -73,7 +73,7 @@ class Temper():
                 #device.reset()
                 device.set_configuration()
             except Exception as e:
-                print( "Error: Unable to setup the device")
+                logging.error( "Error: Unable to setup the device")
                 raise e
                 #print( "Exception: " + e.__class__.__name__ + ": " + str(e))
                 #return
@@ -168,7 +168,7 @@ class Temper():
 
         if len(temperatureBuffer) > 1:
             if temperatureBuffer[0] == 0 and temperatureBuffer[1] == 255:
-                print( "Failed to retrieve temperature" )
+                logging.error( "Failed to retrieve temperature" )
                 return 0.0
             #print( temperatureBuffer )
             temperature = int(temperatureBuffer[0] << 8) + int(temperatureBuffer[1] & 0xff) + self.calibrationConstant
@@ -181,7 +181,7 @@ class Temper():
                 pass
 
         else:
-            print( "Failed to retrieve temperature" )
+            logging.error( "Failed to retrieve temperature" )
             temperature = 0.0
 
         return temperature
@@ -217,10 +217,10 @@ class MessageHandler(object):
         logging.warning('Not expecting inbound messages')
 
     def start(self):
-        logging.info('Message handling start - v4')
+        logging.debug('Message handling start - v4')
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        print('Start - connecting to ', self.broker_address)
+        logging.debug('Start - connecting to ', self.broker_address)
         self.client.connect(self.broker_address)
         # self.client.subscribe(self.doorStatusTopic,0)
         self.client.loop_start()
@@ -271,30 +271,37 @@ def discover_mqtt_host():
 # -----------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------
 if __name__ == '__main__':
-    print("TemperUSB V0.1")
+    logging.warning("TemperUSB V0.1")
     logging.basicConfig(filename='/tmp/temperusb.log', level=logging.INFO)
     #logging.info('MQTTSystemInfo v2.1 [signal_strength]')
     #logging.info('Multicast DNS Service Discovery for Python Browser test')
-    logging.debug('Attempting to find mqtt broker via mDNS')
 
     try:
         host = sys.argv[1]
         mqtt_broker_address = sys.argv[1]
     except:
-        print( 'No host passed in on command line. Trying mDNS' )
+        logging.warning( 'No host passed in on command line. Trying mDNS' )
+        logging.warning('Attempting to find mqtt broker via mDNS')
 
     try:
         deviceNum = sys.argv[2]
     except:
-        print( 'No device name passed in on command line. Will be device 1' )
+        logging.warning( 'No device name passed in on command line. Will be device 1' )
         deviceNum = 1
 
     try:
         location = sys.argv[3]
     except:
-        print( 'No location passed in on command line. Will be UNKNOWN' )
+        logging.warning( 'No location passed in on command line. Will be UNKNOWN' )
         location = 'UNKNOWN'
 
+    try:
+        tempOffset = int( sys.argv[4] )
+    except:
+        logging.warning( 'No temperature correction passed in on command line. Will be 0.0' )
+        tempOffset = 0.0
+
+        
     if (mqtt_broker_address is None):
         #
         host = discover_mqtt_host()
@@ -309,7 +316,7 @@ if __name__ == '__main__':
                 logging.critical('mDNS failed and no MQTT Broker address passed in via command line. Exiting')
                 sys.exit(1)
 
-    logging.debug('Connecting to {}'.format(mqtt_broker_address))
+    logging.warning('Connecting to {}'.format(mqtt_broker_address))
     m = MessageHandler(broker_address=mqtt_broker_address)
     m.start()
 
